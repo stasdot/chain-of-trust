@@ -7,6 +7,7 @@ on:
 jobs:
   install:
     runs-on: self-hosted
+
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -16,10 +17,16 @@ jobs:
         with:
           python-version: '3.11'
 
+      # HARDENING STEP — this is the key defense
+      - name: lock python toolchain after setup
+        run: |
+          echo "pythonLocation is: $pythonLocation"
+          sudo chown -R root:root "$pythonLocation"
+          sudo chmod -R go-w "$pythonLocation"
+
       - name: upgrade pip
         run: python -m pip install --upgrade pip
 
       - name: install dependencies (locked)
         run: |
           pip install --no-index -r requirements.txt
-
